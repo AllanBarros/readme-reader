@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.urls import path
 
-urlpatterns = [
+from api.backend.views import get_readme
 
+urlpatterns = [
+path('get-readme/', get_readme),
 ]
