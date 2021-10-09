@@ -6,7 +6,6 @@ def get_readme(request, slug):
     """Função para busca e leitura dos readme's de uma organização"""
     
     dados_readme = []
-    # 'allan-testing-organization'
 
     lista_repositorios = get_repos_list(slug)
 
@@ -14,7 +13,7 @@ def get_readme(request, slug):
 
         link_arquivo_html = get_readme_html_link(repositorio, slug)
 
-        arquivo = get_readme_content(link_arquivo_html, repositorio)    
+        arquivo = get_readme_content(link_arquivo_html['download_url'])
 
         dados_readme.append(str(arquivo.content))
 
@@ -52,8 +51,7 @@ def get_readme_html_link(repositorio, org):
 
 def get_readme_content(link_arquivo_html):
 
-    arquivo = requests.get(link_arquivo_html['download_url'])
-    
+    arquivo = requests.get(link_arquivo_html)
     if arquivo.status_code == 404:
         arquivo.raise_for_status()
 
