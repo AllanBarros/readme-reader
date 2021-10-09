@@ -18,5 +18,5 @@ from django.urls import path
 from api.backend.views import get_readme
 
 urlpatterns = [
-path('get-readme/', get_readme),
+path('get-readme/<slug:slug>/', get_readme),
 ]
