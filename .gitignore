@@ -1,4 +1,4 @@
-vscode/
+.vscode/
 migrations/
-.env
+local.env
 __pycache__
