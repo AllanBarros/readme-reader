@@ -1,12 +1,13 @@
-from django.http.response import JsonResponse
 import requests
 import json
+from django.shortcuts import render
+from django.core.exceptions import ValidationError
+from django.http.response import JsonResponse
+from .models import Relatorio
 
 def get_readme(request, slug):
-    """Função para busca e leitura dos readme's de uma organização"""
+    """Função para busca, leitura e gravação em banco de dados dos readme's de uma organização"""
     
-    dados_readme = []
-
     lista_repositorios = get_repos_list(slug)
 
     for repositorio in lista_repositorios:
@@ -15,9 +16,9 @@ def get_readme(request, slug):
 
         arquivo = get_readme_content(link_arquivo_html['download_url'])
 
-        dados_readme.append(str(arquivo.content))
+        Relatorio.objects.create(dados=str(arquivo.content))
 
-    return JsonResponse({'resultado':dados_readme})
+    return JsonResponse({'Resposta':'Readmes atualizados no link do relatório.'})
 
 def get_repos_list(org):
     """Função para busca de todos os repositórios dado uma organização específica"""
@@ -38,7 +39,7 @@ def get_repos_list(org):
     return lista_repositorios
     
 def get_readme_html_link(repositorio, org):
-
+    """ Função para busca do link para arquivo html do readme"""
     url_repositorio = 'https://api.github.com/repos/'+ org + '/' + repositorio + '/readme'
 
     result = requests.get(url_repositorio)
@@ -50,9 +51,25 @@ def get_readme_html_link(repositorio, org):
     return link_arquivo_html
 
 def get_readme_content(link_arquivo_html):
-
+    """ Função para pegar o conteudo dos readmes localizados"""
     arquivo = requests.get(link_arquivo_html)
     if arquivo.status_code == 404:
         arquivo.raise_for_status()
 
     return arquivo
+
+def salvar_dados_readme(dado):
+    """ Salvar dados dos readmes para demonstração futura"""
+    try:
+        Relatorio.objects.create(dados=dado) 
+        print('Dado de readme gravado')
+    except:
+        raise ValidationError('Não foi possível adicionar o relatório a base de dados')
+
+def relatorio_render(request):
+    """ Renderizar relatório com os dados dos readmes"""
+    lista_readme = Relatorio.objects.all()
+
+    context = {'lista':lista_readme}
+
+    return render(request, 'readme-report.html', context)
