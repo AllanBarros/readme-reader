@@ -1,6 +1,6 @@
 import pytest
 import requests
-from ..views import get_repos_list, get_readme_html_link, get_readme_content
+from ..views import get_repos_list, get_readme_html_link, get_readme_content, salvar_dados_readme
 
 url_completa = 'http://localhost:8000/get-readme/allan-testing-organization/'
 org_acerto = 'allan-testing-organization'
@@ -8,6 +8,7 @@ org_erro = 'allan-testings-organization'
 link_arquivo_html = 'https://raw.githubusercontent.com/allan-testing-organization/test-2/main/README.md'
 link_arquivo_html_erro = 'https://raw.githubusercontent.com/allan-testing-organization/test-3/main/README.md'
 repositorio = 'test-2'
+url_relatorio = 'http://localhost:8000/relatorio-readme/'
 
 def test_repos_list():
     lista_repos = get_repos_list(org_acerto)
@@ -36,3 +37,7 @@ def test_readme_content_fail():
 def test_readme_complete():
     resultado = requests.get(url_completa)
     assert resultado.content  
+
+def test_relatorio_render():
+    resultado = requests.get(url_relatorio)
+    assert resultado.status_code == 200

@@ -7,7 +7,7 @@ from .models import Relatorio
 
 def get_readme(request, slug):
     """Função para busca, leitura e gravação em banco de dados dos readme's de uma organização"""
-    
+    #slug é o nome da organização
     lista_repositorios = get_repos_list(slug)
 
     for repositorio in lista_repositorios:
@@ -16,7 +16,7 @@ def get_readme(request, slug):
 
         arquivo = get_readme_content(link_arquivo_html['download_url'])
 
-        Relatorio.objects.create(dados=str(arquivo.content))
+        dado_salvo = salvar_dados_readme(str(arquivo.content), repositorio, slug)
 
     return JsonResponse({'Resposta':'Readmes atualizados no link do relatório.'})
 
@@ -58,13 +58,14 @@ def get_readme_content(link_arquivo_html):
 
     return arquivo
 
-def salvar_dados_readme(dado):
+def salvar_dados_readme(dado, rep, org):
     """ Salvar dados dos readmes para demonstração futura"""
     try:
-        Relatorio.objects.create(dados=dado) 
-        print('Dado de readme gravado')
+        Relatorio.objects.create(dados=dado, repositorio=rep, organizacao=org)
     except:
         raise ValidationError('Não foi possível adicionar o relatório a base de dados')
+
+    return True
 
 def relatorio_render(request):
     """ Renderizar relatório com os dados dos readmes"""
