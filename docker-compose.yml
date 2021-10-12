@@ -8,6 +8,31 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
 
+  # Deploy the broker.
+  rabbitmq_server:
+    image: rabbitmq
+    ports:
+      # Expose the port for the worker to add/get tasks
+      - 5672:5672
+      # OPTIONAL: Expose the GUI port
+      - 15672:15672
+
+  # Deploy the worker
+  worker:
+    # Build using the worker Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
+    network_mode: host
+    command: bash -c 'celery -A api worker --loglevel=INFO'
+    # Pass the rabbitmq_uri as env varible in order to
+    # connect to our service
+    environment:
+      rabbitmq_uri: amqp://127.0.0.1:5672
+      # Make it wait for rabbitmq deployment
+    depends_on: 
+      - rabbitmq_server
+
   backend:
     build: .
     env_file:

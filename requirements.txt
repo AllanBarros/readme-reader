@@ -5,5 +5,6 @@ ptvsd==4.3.2
 pytest==6.2.5
 pytest-cov==3.0.0
 pytest-django==4.4.0
+celery==5.1.2
 
 
