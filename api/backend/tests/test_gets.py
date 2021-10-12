@@ -1,6 +1,6 @@
 import pytest
 import requests
-from ..views import get_repos_list, get_readme_html_link, get_readme_content, salvar_dados_readme
+from ..views import get_repos_list, get_readme_html_link, get_readme_content
 
 url_completa = 'http://localhost:8000/get-readme/allan-testing-organization/'
 org_acerto = 'allan-testing-organization'

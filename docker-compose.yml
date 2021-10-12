@@ -17,28 +17,48 @@ services:
       # OPTIONAL: Expose the GUI port
       - 15672:15672
 
-  # Deploy the worker
   worker:
-    # Build using the worker Dockerfile
     build:
       context: .
       dockerfile: Dockerfile
+    # env_file:
+    #   - local.env
     network_mode: host
     command: bash -c 'celery -A api worker --loglevel=INFO'
-    # Pass the rabbitmq_uri as env varible in order to
-    # connect to our service
+    volumes:
+      - .:/app
     environment:
       rabbitmq_uri: amqp://127.0.0.1:5672
-      # Make it wait for rabbitmq deployment
     depends_on: 
       - rabbitmq_server
+      # - db
+      - backend
+      
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # env_file:
+    #   - local.env
+    network_mode: host
+    command: bash -c 'celery -A api beat --loglevel=INFO'
+    volumes:
+      - .:/app
+    environment:
+      rabbitmq_uri: amqp://127.0.0.1:5672
+    depends_on: 
+      - rabbitmq_server
+      - worker
+      # - db
+      - backend
 
   backend:
     build: .
     env_file:
       - local.env
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python manage.py migrate; python manage.py runserver 0.0.0.0:8000'
-
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python manage.py migrate; python manage.py runserver 0.0.0.0:8000 --noreload'
+    links:
+      - db:db
     volumes:
       - .:/app
     ports:
@@ -46,4 +66,5 @@ services:
       - "4000:4000"
     depends_on:
       - db
+      - rabbitmq_server
 

@@ -1,10 +1,22 @@
-<div>
-    {% for readme in lista %}
+<head>
+    <meta charset="UTF-8">
+  </head>
+<body>
     <div>
-        Dados: {{readme.dados}}
+        <table>
+            <tr>
+                <th>Organização</th>
+                <th>Repositório</th>
+                <th>Conteudo</th>
+            </tr>
+            
+            {% for readme in lista %}
+            <tr>
+                <td>{{readme.Organizacao}}</td>
+                <td>{{readme.Repositorio}}</td>
+                <td>{{readme.conteudo}}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
-    <div>
-        Data da busca: {{readme.data_busca}}
-    </div>
-    {% endfor %}
-</div>
+</body>

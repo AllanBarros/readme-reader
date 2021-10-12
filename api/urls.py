@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.urls import path
 
-from api.backend.views import get_readme, relatorio_render
+from api.backend.views import get_readme
+# , relatorio_render
 
 urlpatterns = [
 path('get-readme/<slug:slug>/', get_readme),
-path('relatorio-readme/', relatorio_render),
+# path('relatorio-readme/', relatorio_render),
 ]

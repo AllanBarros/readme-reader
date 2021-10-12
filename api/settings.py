@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8@w8xus$*+s0ac@#l7cm9-v=5+0mpw59o2@_=c6+(qv@^idfbd'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-8@w8xus$*+s0ac@#l7cm9-v=5+0mpw59o2@_=c6+(qv@^idfbd')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -67,14 +68,19 @@ WSGI_APPLICATION = 'api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'NAME': os.environ.get('DB-NAME'),
+        'USER': os.environ.get('DB-USER'),
+        'PASSWORD': os.environ.get('DB-PASSWORD'),
+        'HOST': os.environ.get('DB-HOST'),
         'PORT': 5432,
     }
 }
-
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL')
+DEFAULT_TO_EMAIL = os.environ.get('EMAIL')
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -101,3 +107,15 @@ ADMIN_ENABLED = False
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_BROKER_URL = "amqp://127.0.0.1:5672"
+CELERY_RESULT_BACKEND = "rpc://127.0.0.1:5672"
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+CELERY_BEAT_SCHEDULE = {
+    "call_get_readme": {
+        "task": "call_get_readme",
+        "schedule": crontab(minute="*/1"),
+    },
+}

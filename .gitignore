@@ -4,3 +4,4 @@ local.env
 __pycache__
 htmlcov
 .pytest_cache/
+celerybeat-schedule

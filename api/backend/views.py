@@ -1,14 +1,15 @@
 import requests
 import json
-from django.shortcuts import render
-from django.core.exceptions import ValidationError
-from django.http.response import JsonResponse
-from .models import Relatorio
+from django.conf import settings
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 
 def get_readme(request, slug):
     """Função para busca, leitura e gravação em banco de dados dos readme's de uma organização"""
     #slug é o nome da organização
     lista_repositorios = get_repos_list(slug)
+    
+    lista_readme = []
 
     for repositorio in lista_repositorios:
 
@@ -16,9 +17,11 @@ def get_readme(request, slug):
 
         arquivo = get_readme_content(link_arquivo_html['download_url'])
 
-        dado_salvo = salvar_dados_readme(str(arquivo.content), repositorio, slug)
+        lista_readme.append({'conteudo':str(arquivo.content), 'Repositorio':repositorio, 'Organizacao':slug})
 
-    return JsonResponse({'Resposta':'Readmes atualizados no link do relatório.'})
+    enviar_dados_readme(lista_readme)
+
+    return True
 
 def get_repos_list(org):
     """Função para busca de todos os repositórios dado uma organização específica"""
@@ -58,19 +61,13 @@ def get_readme_content(link_arquivo_html):
 
     return arquivo
 
-def salvar_dados_readme(dado, rep, org):
-    """ Salvar dados dos readmes para demonstração futura"""
-    try:
-        Relatorio.objects.create(dados=dado, repositorio=rep, organizacao=org)
-    except:
-        raise ValidationError('Não foi possível adicionar o relatório a base de dados')
+def enviar_dados_readme(lista):
 
-    return True
+    message = EmailMessage(
+        subject = 'Relatorio',
+        body = render_to_string("readme-report.html",{'lista': lista}),
+        from_email = settings.DEFAULT_TO_EMAIL,
+        to = ['allanbmalves@gmail.com'],
+    )
 
-def relatorio_render(request):
-    """ Renderizar relatório com os dados dos readmes"""
-    lista_readme = Relatorio.objects.all()
-
-    context = {'lista':lista_readme}
-
-    return render(request, 'readme-report.html', context)
+    return message.send(fail_silently=False)
