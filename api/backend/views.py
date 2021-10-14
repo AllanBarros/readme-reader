@@ -67,7 +67,7 @@ def get_readme_content(link_arquivo_html):
     return arquivo
 
 def enviar_dados_readme(lista):
-
+    """ Função para envio de email com relatório de readme's """
     message = EmailMessage(
         subject = 'Relatorio',
         body = render_to_string("readme-report.html",{'lista': lista}),
