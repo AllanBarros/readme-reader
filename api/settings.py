@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-8@w8xus$*+s0ac@#l7cm9-v=5+0mpw59o2@_=c6+(qv@^idfbd')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', False)
 
 ALLOWED_HOSTS = []
 
@@ -75,24 +75,28 @@ DATABASES = {
         'PORT': 5432,
     }
 }
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
-DEFAULT_FROM_EMAIL = os.environ.get('EMAIL')
-DEFAULT_TO_EMAIL = os.environ.get('EMAIL')
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_FROM')
+DEFAULT_TO_EMAIL = os.environ.get('EMAIL_TO')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
+USE_TZ = True
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -116,6 +120,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {
     "call_get_readme": {
         "task": "call_get_readme",
-        "schedule": crontab(minute="*/1"),
+        "schedule": crontab(hour=8, minute=00, day_of_week=1),
+        # "schedule": crontab(minute="*/1"),
     },
 }

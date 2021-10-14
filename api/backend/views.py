@@ -3,6 +3,7 @@ import json
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
+from django.http import HttpResponse
 
 def get_readme(request, slug):
     """Função para busca, leitura e gravação em banco de dados dos readme's de uma organização"""
@@ -21,7 +22,11 @@ def get_readme(request, slug):
 
     enviar_dados_readme(lista_readme)
 
+    if request:
+        return HttpResponse("E-mail com relatório enviado!")
     return True
+
+    
 
 def get_repos_list(org):
     """Função para busca de todos os repositórios dado uma organização específica"""
@@ -67,7 +72,7 @@ def enviar_dados_readme(lista):
         subject = 'Relatorio',
         body = render_to_string("readme-report.html",{'lista': lista}),
         from_email = settings.DEFAULT_TO_EMAIL,
-        to = ['allanbmalves@gmail.com'],
+        to = [settings.DEFAULT_TO_EMAIL],
     )
 
     return message.send(fail_silently=False)
