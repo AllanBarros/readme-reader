@@ -74,5 +74,5 @@ def enviar_dados_readme(lista):
         from_email = settings.DEFAULT_TO_EMAIL,
         to = [settings.DEFAULT_TO_EMAIL],
     )
-
+    message.content_subtype = "html"
     return message.send(fail_silently=False)
